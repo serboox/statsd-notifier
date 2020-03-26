@@ -1,6 +1,7 @@
 .idea
 .vscode/*
 tmp
+config.yaml
 statsd-notifier
 
 # Byte-compiled / optimized / DLL files

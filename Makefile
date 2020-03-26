@@ -18,7 +18,7 @@ run: golangci-lint tests run-app
 
 run-app: clean build
 	@echo "+ $@"
-	./${APP}
+	./${APP} --cfg-dir ./ --cfg-name config.yaml
 
 golangci-lint: goimports
 	@echo "+ $@"
@@ -44,6 +44,15 @@ build: clean
 tests:
 	@echo "+ $@"
 	go test ./...
+
+send-reqests:
+	while :; \
+ 	do \
+          curl -X POST http://127.0.0.1:8077?count=1 \
+          	-d '{"geo":{"CityName":"New York City","ContinentCode":"NA","CountryIsoCode":"US"}}' \
+            /dev/null 1>/dev/null 2>/dev/null; \
+		  sleep 0.1; \
+	done;
 
 
 

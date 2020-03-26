@@ -5,38 +5,42 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/serboox/statsd-notifier/src/configs"
+	"github.com/serboox/statsd-notifier/src/version"
+
 	"github.com/gin-gonic/gin"
 	"github.com/serboox/statsd-notifier/src/requests"
 	log "github.com/sirupsen/logrus"
 )
 
-type config struct {
-	Host      string
-	Port      int
-	DebugMode bool
-}
-
 func main() {
-	cnf := config{
-		Host:      "127.0.0.1",
-		Port:      8077,
-		DebugMode: true,
-	}
+	log.Info("Repository: ", version.Repository)
+	log.Info("Release: ", version.Release)
+	log.Info("Commit: ", version.Commit)
+	log.Info("BuildTime: ", version.BuildTime)
+	log.Infof("HTTP-Server: PID %d", os.Getpid())
+
+	cnf := configs.NewConfig()
+	cnf.ParseFromFile()
+
+	ctx := configs.NewContext(cnf)
+	defer ctx.StatsD.Close()
 
 	ginMode := gin.ReleaseMode
-	if cnf.DebugMode {
+	logMode := log.InfoLevel
+
+	if cnf.Server.DebugMode {
 		ginMode = gin.DebugMode
+		logMode = log.DebugLevel
 	}
 
 	gin.SetMode(ginMode)
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(logMode)
 
-	router := requests.SetupRouter()
+	router := requests.SetupRouter(ctx)
 
-	log.Infof("HTTP-Server: Start in %s:%d ", cnf.Host, cnf.Port)
-	log.Infof("HTTP-Server: PID %d", os.Getpid())
-
-	err := http.ListenAndServe(fmt.Sprintf("%s:%d", cnf.Host, cnf.Port), router)
+	log.Infof("HTTP-Server: Start in %s:%d ", cnf.Server.Host, cnf.Server.Port)
+	err := http.ListenAndServe(fmt.Sprintf("%s:%d", cnf.Server.Host, cnf.Server.Port), router)
 
 	if err != nil {
 		log.Fatalf("Fail HTTP server start: %v", err)

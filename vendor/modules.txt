@@ -1,5 +1,8 @@
 # github.com/davecgh/go-spew v1.1.1
 github.com/davecgh/go-spew/spew
+# github.com/etsy/statsd v0.8.6
+## explicit
+github.com/etsy/statsd/examples/go
 # github.com/gin-contrib/sse v0.1.0
 github.com/gin-contrib/sse
 # github.com/gin-gonic/gin v1.6.1
@@ -47,3 +50,6 @@ github.com/ugorji/go/codec
 golang.org/x/sys/unix
 # gopkg.in/yaml.v2 v2.2.8
 gopkg.in/yaml.v2
+# gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+## explicit
+gopkg.in/yaml.v3

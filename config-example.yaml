@@ -1,0 +1,8 @@
+server:
+  debug_mode: True
+  host: 127.0.0.1
+  port: 8077
+statsd:
+  mocked: False
+  host: 127.0.0.1
+  port: 8125

@@ -5,11 +5,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/serboox/statsd-notifier/src/configs"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestRootPostRoute(t *testing.T) {
-	router := SetupRouter()
+	ctx := configs.NewContextMock()
+	router := SetupRouter(ctx)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/", nil)
