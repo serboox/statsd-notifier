@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	"os"
 
 	"github.com/serboox/statsd-notifier/src/configs"
@@ -40,8 +39,8 @@ func main() {
 	router := requests.SetupRouter(ctx)
 
 	log.Infof("HTTP-Server: Start in %s:%d ", cnf.Server.Host, cnf.Server.Port)
-	err := http.ListenAndServe(fmt.Sprintf("%s:%d", cnf.Server.Host, cnf.Server.Port), router)
 
+	err := router.Run(fmt.Sprintf("%s:%d", cnf.Server.Host, cnf.Server.Port))
 	if err != nil {
 		log.Fatalf("Fail HTTP server start: %v", err)
 	}
