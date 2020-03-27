@@ -3,22 +3,42 @@ package requests
 import (
 	"net/http"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/gin-gonic/gin"
 	"github.com/serboox/statsd-notifier/src/configs"
 	"github.com/serboox/statsd-notifier/src/consts"
+	"github.com/serboox/statsd-notifier/src/exceptions"
 )
+
+// GeoJSON contains information on geo location
+// e.g. {"geo":{"CityName":"New York City","ContinentCode":"NA","CountryIsoCode":"US"}}
+type GeoJSON struct {
+	Geo struct {
+		CityName       string `json:"CityName" binding:"required"`
+		ContinentCode  string `json:"ContinentCode" binding:"required"`
+		CountryIsoCode string `json:"CountryIsoCode" binding:"required"`
+	} `json:"geo"`
+}
 
 func rootPost(c *gin.Context) {
 	ctx := c.MustGet(consts.FieldContext).(*configs.Context)
-	//b.reqUUID = b.ginCtx.MustGet(commConsts.FieldRequestUUID).(string)
 
-	// Create a new StatsD connection
-	// host := "localhost"
-	// port := 8125
+	if count, ok := c.GetQuery(consts.FieldCount); ok {
+		log.Debugf("Count number: %s\n", count)
+	}
 
-	// client := statsd.New(host, port)
-	// client.Increment("production.fqdn.statsd.post.request.counter")
-	ctx.StatsD.Increment("production.fqdn.statsd.post.request.counter")
+	geoJSON := new(GeoJSON)
+	if err := c.BindJSON(geoJSON); err != nil {
+		log.Debugln("Json unmarshal error: ", err)
+		exceptions.BadRequest(err.Error()).Response(c)
+
+		return
+	}
+
+	log.Debugf("Request JSON: %+v", geoJSON)
+
+	go ctx.StatsD.Increment("production.fqdn.statsd.post.request.counter")
 
 	c.String(http.StatusOK, http.StatusText(http.StatusOK))
 }
